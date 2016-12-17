@@ -1,5 +1,3 @@
-# Project Title
-
 # Second java quest! 
 #### Реализован ввод данных с помощью класса Scanner 
 ### Part 1 
