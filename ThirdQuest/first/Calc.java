@@ -1,31 +1,41 @@
 package first;
 
+import first.Cash.Level1;
+
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
+import java.io.*;
 
 import javax.swing.*;
 
 
 public class Calc extends JPanel {
     static File usersDB = new File("UsersDB.txt");
-    static File log = new File("Log.txt");
-    double value = 0;
-    double stackValue;
-    String currentUser;
+    private static File log = new File("Log.log");
+    private double value = 0;
+    private boolean negative = false;
+    private String currentUser;
+    private OperationStack operationStack = new OperationStack();
+    static Level1 level1 = new Level1();
+
 
     private JTextField display = new JTextField("0");
-    private String operator = "=";
     private boolean calculating = true;
-    Font font = new Font("Verdana", Font.PLAIN, 32);
 
-    public Calc() {
+    Calc() throws IOException {
+        FileReader fileReader = new FileReader(log);
+        LineNumberReader lineNumberReader = new LineNumberReader(fileReader);
+        while (lineNumberReader.readLine() != null){
+            FileLog.lineCounter++;
+        }
+        fileReader.close();
+
         currentUser = LoginPage.currentUser;
         setLayout(new BorderLayout());
         display.setEditable(false);
         display.setHorizontalAlignment(SwingConstants.RIGHT);
+        Font font = new Font("Verdana", Font.PLAIN, 32);
         display.setFont(font);
-        display.scrollRectToVisible(new Rectangle(100, 200));
 
         add(display, "North");
 
@@ -37,18 +47,23 @@ public class Calc extends JPanel {
             JButton button = new JButton(buttonLabels.substring(i, i + 1));
             panel.add(button);
             button.setFont(font);
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    String cmd = evt.getActionCommand();
+            button.addActionListener(evt -> {
+                String cmd = evt.getActionCommand();
+                try {
                     CalcEvent(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
             button.addKeyListener(new KeyListener() {
                 @Override
                 public void keyTyped(KeyEvent evt) {
                     String cmd = String.valueOf(evt.getKeyChar());
-                    CalcEvent(cmd);
+                    try {
+                        CalcEvent(cmd);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -65,64 +80,70 @@ public class Calc extends JPanel {
         add(panel, "Center");
     }
 
-    public void CalcEvent(String cmd) {
+    private void CalcEvent(String cmd) throws IOException {
 
-        if ('0' <= cmd.charAt(0) && cmd.charAt(0) <= '9' || cmd.equals(".")) {
-            if (calculating) {
-                display.setText(cmd);
-            }
-            else {
-                display.setText(display.getText() + cmd);
-            }
-            calculating = false;
-        } else {
-            if (calculating) {
-                if (cmd.equals("-")) {
-                    display.setText(cmd);
-                    calculating = false;
+        if (!cmd.equals("=")) {
+            if ('0' <= cmd.charAt(0) && cmd.charAt(0) <= '9' || cmd.equals(".")) {
+                if (calculating) {
+                    operationStack.push();
+                    if (negative) {
+                        value = -Double.valueOf(cmd);
+                    }else {
+                        value = Double.valueOf(cmd);
+                    }
                 } else {
-                    operator = cmd;
+                    if (negative) {
+                        value = value * 10 - Double.valueOf(cmd);
+                    }else{
+                        value = value * 10 + Double.valueOf(cmd);
+                    }
                 }
+                operationStack.pushValue(String.valueOf(value));
+                display.setText(operationStack.getStack());
+                calculating = false;
             } else {
-                stackValue = Double.parseDouble(display.getText());
-                Calculate();
-                operator = cmd;
-                calculating = true;
+                String operator;
+                if (calculating) {
+                    if (cmd.equals("-")) {
+                        negative = true;
+                        calculating = true;
+                    } else {
+                        negative = false;
+                        if (!operationStack.isEmpty()) {
+                            operator = cmd;
+                            operationStack.pushOperator(String.valueOf(operator));
+                            display.setText(operationStack.getStack());
+                        }
+                    }
+                } else {
+                        negative = false;
+                        operator = cmd;
+                        operationStack.pushOperator(String.valueOf(operator));
+                        display.setText(operationStack.getStack());
+                        calculating = true;
+                }
             }
+        } else {
+            negative = false;
+            operationStack.pushOperator("=");
+            String result;
+            String stackContent = operationStack.getStack();
+            result = operationStack.getResult();
+            display.setText(result);
+            FileLog.Write(log, currentUser, stackContent, result);
+            operationStack.clear();
+            calculating = true;
+            level1.print();
+
         }
     }
 
-    private void Calculate() {
-
-        if (operator.equals("+")) {
-            FileLog.Write(log, value, stackValue, "+");
-            value += stackValue;
-            FileLog.Write(log, currentUser, value);
-        }
-        else if (operator.equals("-")) {
-            FileLog.Write(log, value, stackValue, "-");
-            value -= stackValue;
-            FileLog.Write(log, currentUser, value);
-        }
-        else if (operator.equals("*")){
-            FileLog.Write(log, value, stackValue, "*");
-            value *= stackValue;
-            FileLog.Write(log, currentUser, value);
-        }
-        else if (operator.equals("/")) {
-            FileLog.Write(log, value, stackValue, "/");
-            value /= stackValue;
-            FileLog.Write(log, currentUser, value);
-        }
-        else if (operator.equals("=")) {
-            value = stackValue;
-        }
-        display.setText("" + value);
-    }
 
     public static void main(String[] args) {
+
         FileRuler.NewFile(usersDB);
         FileRuler.NewFile(log);
+
         JFrame frame = new JFrame();
         frame.setTitle("Calculator");
         frame.setSize(300, 350);
@@ -134,7 +155,7 @@ public class Calc extends JPanel {
         });
 
         LoginPage loginPane = new LoginPage(frame);
-        loginPane.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginPane.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         loginPane.setVisible(true);
     }
 

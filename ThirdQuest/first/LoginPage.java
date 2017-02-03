@@ -2,17 +2,19 @@ package first;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 
 
-public class LoginPage extends JFrame {
+class LoginPage extends JFrame {
 
-    Font font = new Font("Verdana", Font.BOLD, 16);
-    File file = Calc.usersDB;
+    private Font font = new Font("Verdana", Font.BOLD, 16);
+    private File file = Calc.usersDB;
     static String currentUser;
+    private boolean debug = false;
 
-    public LoginPage(JFrame frame) {
+    LoginPage(JFrame frame) {
+
         setLayout(new BorderLayout());
         setSize(300, 350);
 
@@ -41,11 +43,26 @@ public class LoginPage extends JFrame {
         panel.getComponent(0).setFont(font);
         panel.getComponent(2).setFont(font);
 
+
         logIn.addActionListener(event -> {
+            if (debug){
+                Container calcPane = frame.getContentPane();
+                try {
+                    calcPane.add(new Calc());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                frame.setVisible(true);
+                setVisible(false);
+            }
             if (FileRuler.LogIn(file, login.getText(), password.getText())) {
                 Container calcPane = frame.getContentPane();
                 currentUser = login.getText();
-                calcPane.add(new Calc());
+                try {
+                    calcPane.add(new Calc());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 frame.setVisible(true);
                 setVisible(false);
             } else {
@@ -64,6 +81,7 @@ public class LoginPage extends JFrame {
         });
 
         add(panel, "Center");
+
 
     }
 
