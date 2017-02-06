@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 /**
  * Created by Phoen on 03.02.2017.
- *
+ *Класс кеша первого уровня, содержит список из 10 последних операций и объект кеша второго уровня.
  */
 public class Level1 {
     private LinkedList<Element> list;
@@ -28,6 +28,7 @@ public class Level1 {
         }
     }
 
+    //Поиск операции в кеше
     public String search(String _firstValue,String _secondValue, String _operator){
         for (int i = 0; i < list.size(); i++) {
             if (_operator.equals("+") || _operator.equals("*")){
@@ -45,6 +46,7 @@ public class Level1 {
                 return list.getFirst().result;
             }
         }
+        //Поиск операции в кеше второго уровня
         for (int i = 0; i < level2.list.size(); i++) {
             if (list.get(i).firstValue.equals( _firstValue) && list.get(i).secondValue.equals(_secondValue) && list.get(i).operator.equals( _operator)) {
                 list.addFirst(level2.get(i));

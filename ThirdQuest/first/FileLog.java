@@ -6,46 +6,33 @@ import java.util.Calendar;
 
 class FileLog {
 
+    //*Счетчики строк в последнем архивном логе и числа архивных логов
     static int lineCounter;
-    private static int fileCounter;
+    static int fileCounter;
 
-    static void Write(File file, String login, String stackContent, String result) throws IOException {
+    static synchronized void Write(File file,  String login, String stackContent, String result) throws IOException {
+        //Проверяем число строк в последнем архивированном логе, если их >10 создаем новый архивный лог.
         if (lineCounter >= 10){
-            File archiveFile = new File(file.getPath()+ "."+FileLog.fileCounter);
-            if(file.renameTo(archiveFile)){
-                System.out.println("Файл переименован успешно");
-                lineCounter = 0;
-                FileLog.fileCounter++;
-            }else{
-                System.out.println("Файл не был переименован");
-                if(archiveFile.delete()){
-                    System.out.println("Файл удален");
-                    if(file.renameTo(archiveFile)){
-                        System.out.println("Файл переименован успешно");
-                        FileLog.fileCounter++;
-                    }else{
-                        System.out.println("Файл не был переименован");
-                    }
-                }else System.out.println("Файл не обнаружен");
-
-            }
+            FileLog.fileCounter = Calc.logDir.listFiles().length;
+            //            System.out.println("Файл переименован успешно");
+            Calc.logArch = new File(file.getPath() + "." + fileCounter);
+            lineCounter = 0;
         }
 
-            Calendar calendar = Calendar.getInstance();
-            try (BufferedWriter br = new BufferedWriter(new FileWriter((file), true))) {
-                br.write(calendar.getTime().toString() + "; " + stackContent + result + "; " + login + "\n");
-                lineCounter++;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-    }
 
-//    public static void Write(File file, String login, double value){
-//        try (BufferedWriter br = new BufferedWriter(new FileWriter((file), true))) {
-//            br.write("=" + value + "; " + login + "\n");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+        Calendar calendar = Calendar.getInstance();
+        try (BufferedWriter br = new BufferedWriter(new FileWriter((file), true))) {
+            br.write(calendar.getTime().toString() + "; " + stackContent + result + "; " + login + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (BufferedWriter br = new BufferedWriter(new FileWriter((Calc.logArch), true))) {
+            br.write(calendar.getTime().toString() + "; " + stackContent + result + "; " + login + "\n");
+            lineCounter++;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

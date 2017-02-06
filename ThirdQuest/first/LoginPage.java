@@ -8,10 +8,8 @@ import java.io.IOException;
 
 class LoginPage extends JFrame {
 
-    private Font font = new Font("Verdana", Font.BOLD, 16);
     private File file = Calc.usersDB;
     static String currentUser;
-    private boolean debug = false;
 
     LoginPage(JFrame frame) {
 
@@ -35,6 +33,7 @@ class LoginPage extends JFrame {
         panel.add(logIn);
         panel.add(registration);
         panel.add(check);
+        Font font = new Font("Verdana", Font.BOLD, 16);
         login.setFont(font);
         password.setFont(font);
         logIn.setFont(font);
@@ -45,16 +44,8 @@ class LoginPage extends JFrame {
 
 
         logIn.addActionListener(event -> {
-            if (debug){
-                Container calcPane = frame.getContentPane();
-                try {
-                    calcPane.add(new Calc());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                frame.setVisible(true);
-                setVisible(false);
-            }
+
+            //Если проверка пройдена, создаем окно калькулятора.
             if (FileRuler.LogIn(file, login.getText(), password.getText())) {
                 Container calcPane = frame.getContentPane();
                 currentUser = login.getText();

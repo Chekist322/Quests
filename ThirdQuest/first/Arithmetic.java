@@ -27,6 +27,7 @@ class Arithmetic {
             case "=":
                 return String.valueOf(value);
         }
+        //Добавляем вычисленную операцию в кеш.
         Calc.level1.add(Double.toString(value), Double.toString(stackValue), operator, Double.toString(result));
         return Double.toString(result);
     }

@@ -5,8 +5,8 @@ package first;
  *
  */
 class OperationStack {
-    private int MAX_PRIORITY = Integer.MAX_VALUE;
-    private int MIN_PRIORITY = Integer.MIN_VALUE;
+    private static final int MAX_PRIORITY = Integer.MAX_VALUE;
+    private static final int MIN_PRIORITY = Integer.MIN_VALUE;
 
     private class Element {
         String value;//число

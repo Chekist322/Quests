@@ -2,9 +2,9 @@ package first.Cash;
 
 /**
  * Created by Phoen on 03.02.2017.
- *
+ * Класс элемента кеша
  */
-public class Element {
+class Element {
     String firstValue;
     String secondValue;
     String operator;

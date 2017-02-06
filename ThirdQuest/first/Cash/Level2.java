@@ -4,17 +4,18 @@ import java.util.ArrayList;
 
 /**
  * Created by Phoen on 03.02.2017.
+ *Кеш второго уровня, содержит динамический массив операций, если их больше 10, то очищается
  */
-public class Level2 {
-    public ArrayList<Element> list;
-    private int size = 10;
+class Level2 {
+    ArrayList<Element> list;
 
     Level2(){
         list = new ArrayList<>();
     }
 
 
-    public void add(Element element) {
+    void add(Element element) {
+        int size = 10;
         if (list.size() == size){
             list.clear();
         }else{
@@ -23,11 +24,11 @@ public class Level2 {
     }
 
 
-    public Element get(int ID) {
+    Element get(int ID) {
         return list.get(ID);
     }
 
-    public void print() {
+    void print() {
         System.out.println("Level2");
         for (Element e : list) {
             System.out.print(e.firstValue);

@@ -3,8 +3,8 @@ package first;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Enigma {
-    public static String getHash(String str) {
+class Enigma {
+    static String getHash(String str) {
 
         MessageDigest md5 ;
         StringBuffer  hexString = new StringBuffer();

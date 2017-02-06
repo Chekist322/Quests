@@ -3,9 +3,9 @@ package first;
 
 import java.io.*;
 
-public class FileRuler {
+class FileRuler {
 
-    public static void FileWrite(File file, String login, String password) {
+    static void FileWrite(File file, String login, String password) {
         try (BufferedWriter br = new BufferedWriter(new FileWriter((file), true))) {
             br.write("#" + login + "\n");
             br.write(Enigma.getHash(password) + "\n");
@@ -14,7 +14,7 @@ public class FileRuler {
         }
     }
 
-    public static void NewFile(File file){
+    static void NewFile(File file){
         try
         {
             boolean created = file.createNewFile();
@@ -27,14 +27,14 @@ public class FileRuler {
         }
     }
 
-    public static boolean RegistrationLoginCheck(File file, String login) {
+    static boolean RegistrationLoginCheck(File file, String login) {
         if (!(login.isEmpty()) && (login.matches("[a-zA-Z[1-9]]+")) && RegistrationLoginComparator(file, login)) {
             return true;
         }
         return false;
     }
 
-    public static boolean RegistrationLoginComparator(File file, String login){
+    private static boolean RegistrationLoginComparator(File file, String login){
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
             String line = reader.readLine();
             while (line != null) {
@@ -51,16 +51,7 @@ public class FileRuler {
         return true;
     }
 
-
-
-    public static boolean RegistrationPasswordCheck(String password) {
-        if (!(password.isEmpty()) && (password.matches("[a-zA-Z[1-9]]+"))) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean LogInPasswordCheck(String password) {
+    private static boolean LogInPasswordCheck(String password) {
         if (!(password.isEmpty()) && (password.matches("[a-zA-Z[1-9]]+"))) {
             return true;
         }
@@ -68,8 +59,7 @@ public class FileRuler {
     }
 
 
-
-    public static boolean LogIn(File file, String login, String password) {
+    static boolean LogIn(File file, String login, String password) {
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
             String line = reader.readLine();
             while (line != null) {
