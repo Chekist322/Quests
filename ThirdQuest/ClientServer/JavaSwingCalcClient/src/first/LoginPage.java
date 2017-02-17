@@ -2,14 +2,13 @@ package first;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
 
 
 class LoginPage extends JFrame {
-
-    private File file = Calc.usersDB;
     static String currentUser;
     boolean loginFlag = false;
 
@@ -17,25 +16,55 @@ class LoginPage extends JFrame {
 
 
         setLayout(new BorderLayout());
-        setSize(300, 350);
+        setSize(300, 150);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4,4));
+
+        JPanel bigPanel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        bigPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints constr = new GridBagConstraints();
 
 
         JTextField login = new JTextField("");
         JPasswordField password =new JPasswordField("");
         JButton logIn = new JButton("log in");
         JButton registration = new JButton("registration");
-        JLabel check = new JLabel("");
+        JLabel check = new JLabel("Enter the data");
 
-        panel.add(new JLabel("login"));
-        panel.add(login);
-        panel.add(new JLabel("password"));
-        panel.add(password);
-        panel.add(logIn);
-        panel.add(registration);
-        panel.add(check);
+        constr.fill = GridBagConstraints.HORIZONTAL;
+        constr.gridx = 0;
+        constr.gridy = 0;
+        constr.weightx = 20;
+        constr.weighty = 20;
+        panel.add(new JLabel("login"), constr);
+
+        constr.gridx = 1;
+        constr.gridy = 0;
+        panel.add(login, constr);
+
+        constr.gridx = 0;
+        constr.gridy = 1;
+        panel.add(new JLabel("password"), constr);
+
+        constr.gridx = 1;
+        constr.gridy = 1;
+        panel.add(password, constr);
+
+        constr.gridx = 0;
+        constr.gridy = 2;
+        panel.add(logIn, constr);
+
+        constr.gridx = 1;
+        constr.gridy = 2;
+        panel.add(registration, constr);
+
+        constr.gridx = 0;
+        constr.gridy = 3;
+        constr.gridwidth = 60;
+        panel.add(check, constr);
+
         Font font = new Font("Verdana", Font.BOLD, 16);
         login.setFont(font);
         password.setFont(font);
@@ -64,6 +93,7 @@ class LoginPage extends JFrame {
                         e.printStackTrace();
                     }
                     frame.setVisible(true);
+
                     setVisible(false);
                 } else {
                     check.setText("invalid login or password");

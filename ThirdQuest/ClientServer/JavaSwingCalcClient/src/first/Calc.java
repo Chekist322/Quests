@@ -12,12 +12,10 @@ import java.net.Socket;
 import javax.swing.*;
 
 
-public class Calc extends JPanel {
-    static File usersDB = new File("UsersDB.txt");
+public class Calc extends JPanel  {
     static File logArch;
     private static File log = new File("Log\\Log.log");
     static File logDir = new File("Log\\");
-    private String newValue;
     private double value = 0;
     private boolean negative = false;
     private boolean dotFlag = false;
@@ -48,6 +46,7 @@ public class Calc extends JPanel {
 
 
     Calc() throws IOException {
+
         //Проверка для того, чтобы отсчет архивных логов начинался с 1 и продолжался инкрементированно
         if (FileLog.fileCounter == 1) {
             logArch = new File("Log\\Log.log" + "." + (FileLog.fileCounter));
@@ -72,18 +71,14 @@ public class Calc extends JPanel {
         display.setHorizontalAlignment(SwingConstants.RIGHT);
         Font font = new Font("Verdana", Font.PLAIN, 32);
         display.setFont(font);
-
         add(display, "North");
         display2.setEditable(false);
-//        display2.setHorizontalAlignment(SwingConstants.RIGHT);
         Font font2 = new Font("Verdana", Font.PLAIN, 12);
         display2.setFont(font2);
         display2.setColumns(20);
         display2.setLineWrap(true);
         add(display2, "Center");
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 4));
 
         //Заполняем панель кпонок значениями
         buttonsInit();
@@ -91,36 +86,32 @@ public class Calc extends JPanel {
 
     private void buttonsInit(){
         JButton[] keys = new JButton[buttons.length];
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 3));
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 4));
         for (int i = 0; i < buttons.length; i++) {
             keys[i] = new JButton(buttons[i]);
         }
         add(buttonPanel, "South");
         Font buttonsFont = new Font("Verdana", Font.BOLD, 18);
-        for (int i = 0; i < keys.length; i++) {
-            keys[i].setFocusPainted(false);
-            keys[i].setContentAreaFilled(false);
-            keys[i].setFont(buttonsFont);
-            keys[i].addActionListener(evt -> {
+        for (JButton key : keys) {
+            key.setFocusPainted(false);
+            key.setContentAreaFilled(false);
+            key.setFont(buttonsFont);
+            key.addActionListener(evt -> {
                 String cmd = evt.getActionCommand();
                 try {
                     calcEvent(cmd);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | InterruptedException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
+
             });
-            keys[i].addKeyListener(new KeyListener() {
+            key.addKeyListener(new KeyListener() {
                 @Override
                 public void keyTyped(KeyEvent e) {
+             //       System.out.println(e.getID());
                     try {
                         calcEvent(Character.toString(e.getKeyChar()));
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    } catch (ClassNotFoundException e1) {
+                    } catch (IOException | InterruptedException | ClassNotFoundException e1) {
                         e1.printStackTrace();
                     }
                 }
@@ -135,12 +126,11 @@ public class Calc extends JPanel {
 
                 }
             });
-            buttonPanel.add(keys[i]);
+            buttonPanel.add(key);
         }
     }
 
-    private void calcEvent(String cmd) throws IOException, InterruptedException, ClassNotFoundException {
-
+    void calcEvent(String cmd) throws IOException, InterruptedException, ClassNotFoundException {
         if (!cmd.equals("=")) {
             if ('0' <= cmd.charAt(0) && cmd.charAt(0) <= '9') {
                 if (calculating) {
@@ -180,7 +170,7 @@ public class Calc extends JPanel {
                 }
                 operationStack.pushValue(String.valueOf(value));
                 display2.setText(operationStack.getStack());
-                display.setText(cmd);
+                display.setText(Double.toString(value));
                 calculating = false;
             }
             else if (cmd.equals(".")){
@@ -197,7 +187,6 @@ public class Calc extends JPanel {
                             operator = cmd;
                             operationStack.pushOperator(String.valueOf(operator));
                             display2.setText(operationStack.getStack());
-                            display.setText(cmd);
                         }
                     }
                 } else {
@@ -205,14 +194,14 @@ public class Calc extends JPanel {
                         operator = cmd;
                         operationStack.pushOperator(String.valueOf(operator));
                         display2.setText(operationStack.getStack());
-                        display.setText(cmd);
+                        display.setText(Double.toString(value));
                         calculating = true;
                 }
                 value = 0;
                 dot = 10;
                 dotFlag = false;
             }
-        } else {
+        } else if (cmd.equals("=")){
             if (operationStack.isEmpty()){
 
             }else {
@@ -223,6 +212,7 @@ public class Calc extends JPanel {
                 //Отправляем на сервер запрос на расчет выражения
                 result = operationStack.getResult();
                 display2.setText(display2.getText() + "=" + result);
+                display.setText(result);
                 //Отправляем на сервер всё выражение в строке для логирования
                 output.writeBoolean(false);
                 output.writeUTF(stackContent);
@@ -239,6 +229,7 @@ public class Calc extends JPanel {
             }
 
         }
+        if (cmd.contains("\n"));
     }
 
 
@@ -252,8 +243,6 @@ public class Calc extends JPanel {
         input = new DataInputStream(inputStream);
         logDir.mkdir();
         FileLog.fileCounter = logDir.listFiles().length;
-//        System.out.println(logDir.listFiles().length);
-        FileRuler.newFile(usersDB);
         FileRuler.newFile(log);
 
         JFrame frame = new JFrame();
@@ -276,6 +265,4 @@ public class Calc extends JPanel {
         loginPane.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         loginPane.setVisible(true);
     }
-
-
 }

@@ -48,11 +48,9 @@ public class NewThread implements Runnable{
                 if (FileRuler.registrationLoginCheck(file, login)) {
                     FileRuler.fileWrite(file, login, password);
                     output.writeBoolean(true);
-                    flag = false;
                 } else {
                     output.writeBoolean(false);
                 }
-
             }
         }
 
